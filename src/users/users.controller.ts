@@ -14,6 +14,7 @@ import { CreateUserDto } from './dto/create-user.dto'
 import { UpdateUserDto } from './dto/update-user.dto'
 import { ApiBody, ApiTags } from '@nestjs/swagger'
 import { User } from './entities/user.entity'
+import { ObjectId } from 'mongodb'
 
 @Controller('users')
 @ApiTags('Users')
@@ -40,14 +41,14 @@ export class UsersController {
 	}
 
 	@Get(':id')
-	async findOne(@Param('id') id: number): Promise<User> {
+	async findOne(@Param('id') id: ObjectId): Promise<User> {
 		return await this.usersService.findOne(id)
 	}
 
 	@Delete(':id')
 	@HttpCode(HttpStatus.NO_CONTENT)
-	async remove(@Param('id') id: string): Promise<void> {
-		return await this.usersService.remove(+id)
+	async remove(@Param('id') id: ObjectId): Promise<void> {
+		return await this.usersService.remove(id)
 	}
 
 	@Patch(':id/activate')
