@@ -6,6 +6,7 @@ import { TypeOrmModule } from '@nestjs/typeorm'
 import { ConfigModule } from '@nestjs/config'
 import { join } from 'path'
 import { AwsS3Module } from './aws-s3/aws-s3.module'
+import { UsersModule } from './users/users.module'
 
 @Module({
 	imports: [
@@ -26,7 +27,8 @@ import { AwsS3Module } from './aws-s3/aws-s3.module'
 			useNewUrlParser: true,
 			logging: true
 		}),
-		AwsS3Module
+		AwsS3Module,
+		UsersModule
 	],
 	controllers: [AppController],
 	providers: [AppService]
