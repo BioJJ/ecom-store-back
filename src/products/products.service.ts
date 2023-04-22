@@ -24,11 +24,11 @@ export class ProductsService {
 	}
 
 	async update(
-		id: string,
+		id: mongodb.ObjectId,
 		updateProductDto: UpdateProductDto,
 		file: Express.Multer.File
 	): Promise<void> {
-		const product = await this.findOne(+id)
+		const product = await this.findOne(id)
 
 		if (file != null) {
 			updateProductDto.image = await this.addFile(file)
@@ -44,7 +44,7 @@ export class ProductsService {
 		})
 	}
 
-	async findOne(id: number): Promise<Product> {
+	async findOne(id: mongodb.ObjectId): Promise<Product> {
 		const product = await this.productRepository.findOneOrFail({
 			select: ['_id', 'name', 'price', 'status', 'image'],
 			where: { _id: new mongodb.ObjectId(id) }
@@ -56,8 +56,8 @@ export class ProductsService {
 		return product
 	}
 
-	async remove(id: number): Promise<void> {
-		await this.findOne(+id)
+	async remove(id: mongodb.ObjectId): Promise<void> {
+		await this.findOne(id)
 
 		if (!id) {
 			throw new NotFoundException(`Não achei um Produto com o id ${id}`)
