@@ -17,6 +17,7 @@ import { UpdateProductDto } from './dto/update-product.dto'
 import { Product } from './entities/product.entity'
 import { ApiBody, ApiTags } from '@nestjs/swagger'
 import { FileInterceptor } from '@nestjs/platform-express'
+import { ObjectId } from 'mongodb'
 
 @Controller('products')
 @ApiTags('Products')
@@ -37,7 +38,7 @@ export class ProductsController {
 	@ApiBody({ type: UpdateProductDto })
 	@UseInterceptors(FileInterceptor('file'))
 	async update(
-		@Param('id') id: string,
+		@Param('id') id: ObjectId,
 		@Body() updateProductDto: UpdateProductDto,
 		@UploadedFile() file: Express.Multer.File
 	): Promise<void> {
@@ -50,13 +51,13 @@ export class ProductsController {
 	}
 
 	@Get(':id')
-	async findOne(@Param('id') id: number): Promise<Product> {
+	async findOne(@Param('id') id: ObjectId): Promise<Product> {
 		return await this.productsService.findOne(id)
 	}
 
 	@Delete(':id')
 	@HttpCode(HttpStatus.NO_CONTENT)
-	async remove(@Param('id') id: number): Promise<void> {
+	async remove(@Param('id') id: ObjectId): Promise<void> {
 		return await this.productsService.remove(id)
 	}
 }

@@ -3,13 +3,13 @@ import { CreateUserDto } from './dto/create-user.dto'
 import { UpdateUserDto } from './dto/update-user.dto'
 import { InjectRepository } from '@nestjs/typeorm'
 import { User } from './entities/user.entity'
-import { FindOneOptions, Repository } from 'typeorm'
+import { MongoRepository } from 'typeorm'
 import * as mongodb from 'mongodb'
 
 @Injectable()
 export class UsersService {
 	constructor(
-		@InjectRepository(User) private userRepository: Repository<User>
+		@InjectRepository(User) private userRepository: MongoRepository<User>
 	) {}
 
 	async create(createUserDto: CreateUserDto): Promise<User> {
@@ -31,7 +31,7 @@ export class UsersService {
 		})
 	}
 
-	async findOne(id: number): Promise<User> {
+	async findOne(id: mongodb.ObjectId): Promise<User> {
 		const user = await this.userRepository.findOneOrFail({
 			select: ['_id', 'name', 'email', 'role', 'status'],
 			where: { _id: new mongodb.ObjectId(id) }
@@ -43,8 +43,20 @@ export class UsersService {
 		return user
 	}
 
-	async remove(id: number): Promise<void> {
-		await this.findOne(+id)
+	async findEmail(email: string): Promise<User> {
+		const user = await this.userRepository.findOneOrFail({
+			select: ['_id', 'name', 'email', 'role', 'status', 'password'],
+			where: { email }
+		})
+
+		if (!user) {
+			throw new NotFoundException(`Não achei um usuario com o Email ${user}`)
+		}
+		return user
+	}
+
+	async remove(id: mongodb.ObjectId): Promise<void> {
+		await this.findOne(id)
 
 		if (!id) {
 			throw new NotFoundException(`Não achei um Usuario com o id ${id}`)
