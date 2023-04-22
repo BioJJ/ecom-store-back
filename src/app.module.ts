@@ -7,6 +7,9 @@ import { ConfigModule } from '@nestjs/config'
 import { join } from 'path'
 import { AwsS3Module } from './aws-s3/aws-s3.module'
 import { UsersModule } from './users/users.module'
+import { AuthModule } from './auth/auth.module'
+import { APP_GUARD } from '@nestjs/core'
+import { JwtAuthGuard } from './auth/guards/jwt-auth.guard'
 
 @Module({
 	imports: [
@@ -28,9 +31,16 @@ import { UsersModule } from './users/users.module'
 			logging: true
 		}),
 		AwsS3Module,
-		UsersModule
+		UsersModule,
+		AuthModule
 	],
 	controllers: [AppController],
-	providers: [AppService]
+	providers: [
+		AppService,
+		{
+			provide: APP_GUARD,
+			useClass: JwtAuthGuard
+		}
+	]
 })
 export class AppModule {}
