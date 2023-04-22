@@ -1,4 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger'
+import { ObjectId } from 'mongodb'
 import {
 	Column,
 	CreateDateColumn,
@@ -12,7 +13,7 @@ import {
 export class Product {
 	@ObjectIdColumn()
 	@ApiProperty()
-	_id: number
+	_id: ObjectId
 
 	@Column()
 	@ApiProperty()
@@ -24,7 +25,7 @@ export class Product {
 
 	@Column()
 	@ApiProperty()
-	image: Object
+	image: string
 
 	@Column({ default: true })
 	@ApiProperty()

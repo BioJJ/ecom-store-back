@@ -5,11 +5,13 @@ import { ProductsModule } from './products/products.module'
 import { TypeOrmModule } from '@nestjs/typeorm'
 import { ConfigModule } from '@nestjs/config'
 import { join } from 'path'
+import { AwsS3Module } from './aws-s3/aws-s3.module'
 
 @Module({
 	imports: [
 		ConfigModule.forRoot({
-			envFilePath: '.env'
+			envFilePath: '.env',
+			isGlobal: true
 		}),
 		ProductsModule,
 		TypeOrmModule.forRoot({
@@ -23,7 +25,8 @@ import { join } from 'path'
 			synchronize: true,
 			useNewUrlParser: true,
 			logging: true
-		})
+		}),
+		AwsS3Module
 	],
 	controllers: [AppController],
 	providers: [AppService]
