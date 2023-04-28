@@ -6,11 +6,14 @@ import { Product } from './entities/product.entity'
 import { MongoRepository } from 'typeorm'
 import { AwsS3Service } from 'src/aws-s3/aws-s3.service'
 import * as mongodb from 'mongodb'
+import { CategoriesService } from 'src/categories/categories.service'
+import { Category } from '../categories/entities/category.entity'
 @Injectable()
 export class ProductsService {
 	constructor(
 		@InjectRepository(Product)
 		private readonly productRepository: MongoRepository<Product>,
+		private readonly categoryService: CategoriesService,
 		private awsS3Service: AwsS3Service
 	) {}
 
@@ -18,6 +21,10 @@ export class ProductsService {
 		createProductDto: CreateProductDto,
 		file: Express.Multer.File
 	): Promise<Product> {
+		console.log(createProductDto)
+		createProductDto.category = await this.findCategoryById(
+			createProductDto.category
+		)
 		createProductDto.image = await this.addFile(file)
 		const product = this.productRepository.create(createProductDto)
 		return await this.productRepository.save(product)
@@ -40,14 +47,21 @@ export class ProductsService {
 
 	async findAll(): Promise<Product[]> {
 		return await this.productRepository.find({
-			select: ['_id', 'name', 'price', 'status', 'image']
+			join: { alias: 'Category', innerJoin: { product: 'category.product' } },
+			select: ['_id', 'name', 'price', 'status', 'image', 'category'],
+			relations: {
+				category: true
+			}
 		})
 	}
 
 	async findOne(id: mongodb.ObjectId): Promise<Product> {
 		const product = await this.productRepository.findOneOrFail({
-			select: ['_id', 'name', 'price', 'status', 'image'],
-			where: { _id: new mongodb.ObjectId(id) }
+			select: ['_id', 'name', 'price', 'status', 'image', 'category'],
+			where: { _id: new mongodb.ObjectId(id) },
+			relations: {
+				category: true
+			}
 		})
 
 		if (!id) {
@@ -73,5 +87,15 @@ export class ProductsService {
 		const fileUrl = await this.awsS3Service.uploadFile(file, bucketKey)
 
 		return fileUrl
+	}
+
+	private async findCategoryById(cat: Category) {
+		const category = await this.categoryService.findOne(cat)
+
+		if (!category) {
+			throw new NotFoundException(`Não achei um Categoria com o id ${cat._id}`)
+		}
+
+		return category
 	}
 }

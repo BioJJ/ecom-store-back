@@ -1,10 +1,12 @@
 import { ApiProperty } from '@nestjs/swagger'
 import { ObjectId } from 'mongodb'
+import { Category } from 'src/categories/entities/category.entity'
 import {
 	Column,
 	CreateDateColumn,
 	DeleteDateColumn,
 	Entity,
+	ManyToOne,
 	ObjectIdColumn,
 	UpdateDateColumn
 } from 'typeorm'
@@ -30,6 +32,9 @@ export class Product {
 	@Column({ default: true })
 	@ApiProperty()
 	status: boolean
+
+	@ManyToOne(() => Category, (category) => category.product)
+	category: Category
 
 	@CreateDateColumn({
 		type: 'timestamp',
