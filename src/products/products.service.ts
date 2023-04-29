@@ -47,7 +47,6 @@ export class ProductsService {
 
 	async findAll(): Promise<Product[]> {
 		return await this.productRepository.find({
-			join: { alias: 'Category', innerJoin: { product: 'category.product' } },
 			select: ['_id', 'name', 'price', 'status', 'image', 'category'],
 			relations: {
 				category: true

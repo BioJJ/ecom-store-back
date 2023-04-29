@@ -34,6 +34,7 @@ export class Product {
 	status: boolean
 
 	@ManyToOne(() => Category, (category) => category.product)
+	@Column()
 	category: Category
 
 	@CreateDateColumn({
